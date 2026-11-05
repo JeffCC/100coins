@@ -94,15 +94,17 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid 
 .sim > * { min-width: 0; }
 @media (min-width: 780px) { .sim { grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; padding: 20px; } }
 
-.board { position: relative; width: 100%; aspect-ratio: 10 / 10; }
+.board { --units: 10; position: relative; width: 100%; aspect-ratio: 10 / var(--units); }
+/* Height comes from the board's row count, because iOS WebKit stretches a button sized with aspect-ratio. */
 .coin {
-  position: absolute; left: 0; top: 0; width: 10%; aspect-ratio: 1; padding: 2px; border: 0; background: none;
+  position: absolute; left: 0; top: 0; width: 10%; height: calc(100% / var(--units));
+  margin: 0; padding: 0; border: 0; border-radius: 50%; background: none; -webkit-appearance: none; appearance: none;
   transition: transform .42s cubic-bezier(.3,.8,.3,1); will-change: transform; color: inherit;
 }
 .coin:disabled { cursor: default; }
 .board.live .coin { cursor: pointer; }
 .face {
-  display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%;
+  position: absolute; inset: 2px; display: grid; place-items: center; border-radius: 50%;
   font: 700 clamp(11px, 2.3vw, 15px)/1 var(--display);
 }
 .board.live .coin:hover .face { filter: brightness(1.2); }
@@ -263,8 +265,9 @@ input[type="range"] { width: 100%; accent-color: var(--head); margin: 0; }
   function place(c, x, y, rot) {
     c.el.style.transform = 'translate(' + (x * 100) + '%,' + (y * 100) + '%)' + (rot ? ' rotate(' + rot + 'deg)' : '');
   }
+  function setUnits(units) { board.style.setProperty('--units', units); }
   function layoutGrid() {
-    board.style.aspectRatio = '10 / 10';
+    setUnits(10);
     $('labelA').hidden = $('labelB').hidden = true;
     order.forEach(function (id, slot) { place(coins[id], slot % 10, Math.floor(slot / 10)); });
   }
@@ -274,7 +277,7 @@ input[type="range"] { width: 100%; accent-color: var(--head); margin: 0; }
     var LABEL = 0.7, GAP = 0.3, y = LABEL;
     var rowsA = Math.ceil(a.length / 10), rowsB = Math.ceil(b.length / 10);
     var yB = LABEL + rowsA + GAP + LABEL, units = yB + rowsB;
-    board.style.aspectRatio = '10 / ' + units;
+    setUnits(units);
     a.forEach(function (id, n) { place(coins[id], n % 10, y + Math.floor(n / 10)); });
     b.forEach(function (id, n) { place(coins[id], n % 10, yB + Math.floor(n / 10)); });
     $('labelA').textContent = '第一堆（' + a.length + ' 枚）';
@@ -323,7 +326,7 @@ input[type="range"] { width: 100%; accent-color: var(--head); margin: 0; }
     var alive = function () { return id === runId; };
     setStage('intro');
     $('labelA').hidden = $('labelB').hidden = true;
-    board.style.aspectRatio = '10 / 10';
+    setUnits(10);
     resetCoins();
     if (reduced) { startChoosing(); return; }
 
