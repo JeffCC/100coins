@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>國王的百枚硬幣</title>
-<meta name="description" content="親手摸硬幣、翻面，看懂為什麼蒙著眼也能把 100 枚硬幣分成正面數相等的兩堆。">
+<meta name="description" content="蒙著眼睛，要把 100 枚硬幣分成正面數量相同的兩堆，你會怎麼分？先想想，再動手試。">
 <meta property="og:title" content="國王的百枚硬幣">
-<meta property="og:description" content="親手摸硬幣、翻面，看懂為什麼蒙著眼也能把 100 枚硬幣分成正面數相等的兩堆。">
+<meta property="og:description" content="蒙著眼睛，要把 100 枚硬幣分成正面數量相同的兩堆，你會怎麼分？先想想，再動手試。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jeffcc.github.io/100coins/">
 <script>
@@ -21,18 +21,14 @@
     document.head.appendChild(sc);
   }
 </script>
-<style>
-  :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  body { margin: 0; }
-  img { max-width: 100%; }
-  [hidden] { display: none !important; }
-</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
-/* Layout: one reading column; the coin table is a felt-covered counting board that stays dark in both themes. */
+/* Layout: the puzzle statement, then one felt counting board with its controls beside it. */
 :root {
+  color-scheme: light;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
   --bg: #edf1ee;
   --panel: #fbfcfa;
   --ink: #14302d;
@@ -40,7 +36,6 @@
   --line: #cdd8d3;
   --accent: #0d6b60;
   --on-accent: #ffffff;
-  --warn: #a8431c;
   --felt: #1c4a44;
   --felt-deep: #153a35;
   --felt-ink: #e8f3ee;
@@ -56,559 +51,426 @@
   --tail-ink: #2b3938;
   --blind: #5d7a75;
   --blind-edge: #466460;
+  --blind-ink: #e8f3ee;
   --display: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "Noto Sans TC", serif;
   --body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0e1918; --panel: #162322; --ink: #e3eeeb; --muted: #94aaa6; --line: #2c3f3d;
-    --accent: #56c7b6; --on-accent: #06211d; --warn: #f0966c;
+    --accent: #56c7b6; --on-accent: #06211d;
     --felt: #173d38; --felt-deep: #102f2b; --felt-line: #38625c;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e1918; --panel: #162322; --ink: #e3eeeb; --muted: #94aaa6; --line: #2c3f3d;
-  --accent: #56c7b6; --on-accent: #06211d; --warn: #f0966c;
+  --accent: #56c7b6; --on-accent: #06211d;
   --felt: #173d38; --felt-deep: #102f2b; --felt-line: #38625c;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font: 400 16px/1.8 var(--body); }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.8 var(--body); }
 .page {
-  max-width: 860px; margin: 0 auto;
+  max-width: 900px; margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 40px 64px;
-  display: grid; gap: 52px;
+  padding-block: 36px 96px;
+  display: grid; gap: 28px;
 }
 .page > * { min-width: 0; }
-h1, h2 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.3; }
-h1 { font-size: clamp(34px, 7vw, 52px); }
-h2 { font-size: clamp(24px, 4.4vw, 30px); }
-p { margin: 0; max-width: 40em; }
-.stack { display: grid; gap: 16px; }
+h1 { font: 700 clamp(34px, 7vw, 52px)/1.3 var(--display); text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.intro { display: grid; gap: 12px; max-width: 40em; }
 .lead { font-size: 18px; }
-.answer { font-family: var(--display); font-size: clamp(20px, 3.6vw, 24px); line-height: 1.5; color: var(--accent); font-weight: 700; }
-.note { color: var(--muted); font-size: 14px; }
-.nums { font-variant-numeric: tabular-nums; }
+.quote { font: 700 clamp(20px, 3.6vw, 24px)/1.5 var(--display); }
+.prompt { color: var(--accent); font-weight: 700; }
 
 button { font: inherit; }
-button:focus-visible, input:focus-visible { outline: 3px solid var(--head); outline-offset: 2px; }
-.btn {
-  border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 700; cursor: pointer;
-  background: var(--accent); color: var(--on-accent);
-}
-.btn:hover:not(:disabled) { filter: brightness(1.1); }
-.btn:disabled { opacity: .5; cursor: default; }
-.btn.ghost { background: transparent; color: inherit; box-shadow: inset 0 0 0 1.5px currentColor; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--head); outline-offset: 2px; }
 
-/* Counting board */
-.sim { background: var(--felt); color: var(--felt-ink); border-radius: 14px; padding: 18px; display: grid; gap: 16px; }
-.sim-top { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; }
-.steps { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; font-size: 14px; color: var(--felt-muted); }
-.steps li { display: flex; gap: 6px; align-items: center; }
-.steps b { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; box-shadow: inset 0 0 0 1.5px var(--felt-muted); }
-.steps li.on { color: var(--felt-ink); font-weight: 700; }
-.steps li.on b { background: var(--head); color: var(--head-ink); box-shadow: none; }
-.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
-.switch input { width: 18px; height: 18px; accent-color: var(--head); margin: 0; }
+.sim { background: var(--felt); color: var(--felt-ink); border-radius: 14px; padding: 16px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.sim > * { min-width: 0; }
+@media (min-width: 780px) { .sim { grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; padding: 20px; } }
 
-.zones { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
-.left { display: grid; gap: 14px; align-content: start; min-width: 0; }
-.zone-label { font-size: 14px; color: var(--felt-muted); margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; }
-.grid { display: grid; gap: 4px; grid-template-columns: repeat(10, minmax(0, 1fr)); }
-.slot { aspect-ratio: 1; display: grid; place-items: center; min-width: 0; }
-.slot.empty::after { content: ""; width: 26%; height: 26%; border-radius: 50%; background: var(--felt-deep); }
-.slot.hand-slot { border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--felt-line); background: var(--felt-deep); }
-.slot.hand-slot.empty::after { display: none; }
-
+.board { position: relative; width: 100%; aspect-ratio: 10 / 10; }
 .coin {
-  width: 100%; height: 100%; border: 0; padding: 0; border-radius: 50%; display: grid; place-items: center;
-  font: 700 clamp(11px, 2.4vw, 15px)/1 var(--display); will-change: transform;
+  position: absolute; left: 0; top: 0; width: 10%; aspect-ratio: 1; padding: 2px; border: 0; background: none;
+  transition: transform .42s cubic-bezier(.3,.8,.3,1); will-change: transform; color: inherit;
 }
-button.coin { cursor: pointer; }
-button.coin:disabled { cursor: default; }
-.sim.picking button.coin:hover { transform: scale(1.12); }
-.coin.h { background: var(--head); color: var(--head-ink); box-shadow: inset 0 0 0 2px var(--head-edge); }
-.coin.t { background: var(--tail); color: var(--tail-ink); box-shadow: inset 0 0 0 2px var(--tail-edge); }
-.coin.b { background: var(--blind); color: transparent; box-shadow: inset 0 0 0 2px var(--blind-edge); }
+.coin:disabled { cursor: default; }
+.board.live .coin { cursor: pointer; }
+.face {
+  display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%;
+  font: 700 clamp(11px, 2.3vw, 15px)/1 var(--display);
+}
+.board.live .coin:hover .face { filter: brightness(1.2); }
+.face.h { background: var(--head); color: var(--head-ink); box-shadow: inset 0 0 0 2px var(--head-edge); }
+.face.t { background: var(--tail); color: var(--tail-ink); box-shadow: inset 0 0 0 2px var(--tail-edge); }
+.face.b { background: var(--blind); color: var(--blind-ink); box-shadow: inset 0 0 0 2px var(--blind-edge), inset 0 0 0 5px var(--blind); }
+.coin.sel .face { outline: 3px solid var(--felt-even); outline-offset: -1px; }
+.pile-label { position: absolute; left: 2px; font-size: 14px; color: var(--felt-muted); line-height: 1.2; }
 
+.panel { display: grid; gap: 14px; align-content: start; }
+.panel h2 { font: 700 22px/1.4 var(--display); margin: 0; text-wrap: balance; }
+.panel p { font-size: 15px; line-height: 1.7; }
+.muted { color: var(--felt-muted); }
+.count { font-variant-numeric: tabular-nums; font-size: 15px; }
+.count b { font: 700 26px/1.2 var(--display); color: var(--head); }
+input[type="range"] { width: 100%; accent-color: var(--head); margin: 0; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 700; cursor: pointer; background: var(--head); color: var(--head-ink); }
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.ghost { background: transparent; color: var(--felt-ink); box-shadow: inset 0 0 0 1.5px var(--felt-muted); font-weight: 500; }
 .score { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; background: var(--felt-deep); border-radius: 10px; padding: 10px 12px; text-align: center; }
 .score small { display: block; font-size: 13px; color: var(--felt-muted); line-height: 1.4; }
 .score strong { font: 700 34px/1.2 var(--display); font-variant-numeric: tabular-nums; }
 .sign { font: 700 30px/1 var(--display); }
 .sign.even { color: var(--felt-even); }
 .sign.odd { color: var(--felt-warn); }
+.test { background: var(--felt-deep); border-radius: 10px; padding: 10px 12px; }
 
-.status { min-height: 3.6em; margin: 0; max-width: none; }
-.controls { display: flex; flex-wrap: wrap; gap: 10px; }
-.sim .btn { background: var(--head); color: var(--head-ink); }
-.sim .btn.ghost { background: transparent; color: var(--felt-ink); }
-
-@media (min-width: 720px) {
-  .zones { grid-template-columns: 230px minmax(0, 1fr); gap: 24px; }
-  .left .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.next {
+  position: fixed; z-index: 20;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 18px; border-radius: 999px; font-weight: 700; text-decoration: none;
+  background: var(--panel); color: var(--accent); box-shadow: 0 2px 10px rgb(0 0 0 / .25), inset 0 0 0 1.5px var(--accent);
 }
-
-/* Slider lineup */
-.field { display: grid; gap: 4px; }
-.field label { font-weight: 500; }
-input[type="range"] { width: 100%; max-width: 460px; accent-color: var(--accent); margin: 0; }
-.lineup { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; }
-.row-label { font-size: 14px; color: var(--muted); grid-column: 1; }
-.row-total { grid-column: 2; grid-row: 1; font-size: 14px; font-weight: 700; text-align: right; }
-.row .grid { grid-column: 1 / -1; max-width: 460px; }
-.row .coin { font-size: clamp(11px, 2.6vw, 15px); }
-.ghost-coin { width: 100%; height: 100%; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line); }
-.coin.mark { outline: 3px solid var(--accent); outline-offset: 1px; }
-.equation { font-family: var(--display); font-size: 20px; line-height: 1.6; }
-
-/* Table */
-.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 15px; }
-th, td { padding: 7px 10px; text-align: center; border-bottom: 1px solid var(--line); }
-th { font-size: 13px; font-weight: 500; color: var(--muted); line-height: 1.4; vertical-align: bottom; }
-tbody tr:last-child td { border-bottom: 0; }
-tr.current td { background: color-mix(in srgb, var(--accent) 16%, transparent); font-weight: 700; }
-.ok { color: var(--accent); font-weight: 700; }
-.tally { font-weight: 500; }
-.action-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
-
-/* Hand-size test */
-.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
-.readout small { display: block; font-size: 13px; color: var(--muted); line-height: 1.4; }
-.readout strong { font: 700 28px/1.3 var(--display); font-variant-numeric: tabular-nums; }
-.readout .bad { color: var(--warn); }
-.readout .good { color: var(--accent); }
-
-.points { margin: 0; padding-left: 1.3em; display: grid; gap: 10px; max-width: 40em; }
+.next.solved { background: var(--accent); color: var(--on-accent); }
+@media (prefers-reduced-motion: reduce) { .coin { transition: none; } }
 </style>
-
 </head>
 <body>
 <main class="page">
-  <header class="stack">
+  <header class="intro">
     <h1>國王的百枚硬幣</h1>
-    <p class="lead">桌上有 100 枚硬幣，10 枚正面、90 枚反面。你被蒙上眼睛，也摸不出正反。國王要你分成兩堆，而且兩堆的正面數量必須一樣。</p>
-    <p class="answer">解法：隨便摸 10 枚當一堆，再把這 10 枚全部翻面。</p>
-    <p>聽起來像魔術，動手做一次就知道了。正面寫「正」，反面寫「反」。想體驗國王的難題，可以勾選「蒙上眼睛」。</p>
+    <p class="lead">國王把 100 枚硬幣撒在桌上，其中 10 枚正面朝上、90 枚反面朝上。你被蒙上雙眼，摸不出硬幣的正反。</p>
+    <p class="quote">「把硬幣分成兩堆，保證兩堆正面朝上的數量完全一樣，我就放你走。」</p>
+    <p class="prompt">你會怎麼分？先自己想想，再到下面動手試。</p>
   </header>
 
-  <section class="sim picking" id="sim" aria-label="硬幣模擬">
-    <div class="sim-top">
-      <ol class="steps" id="steps">
-        <li data-step="0"><b>1</b>摸 10 枚</li>
-        <li data-step="1"><b>2</b>全部翻面</li>
-        <li data-step="2"><b>3</b>數正面</li>
-      </ol>
-      <label class="switch"><input type="checkbox" id="blind">蒙上眼睛</label>
+  <section class="sim" aria-label="硬幣模擬">
+    <div class="board" id="board">
+      <span class="pile-label" id="labelA" hidden></span>
+      <span class="pile-label" id="labelB" hidden></span>
     </div>
-    <div class="zones">
-      <div class="left">
-        <div>
-          <div class="zone-label"><span>你手上這堆</span><span class="nums" id="handCount"></span></div>
-          <div class="grid" id="hand"></div>
+
+    <div class="panel">
+      <div class="panel" id="pIntro">
+        <h2 id="introTitle"></h2>
+        <p id="introText" aria-live="polite"></p>
+        <div class="btns"><button class="btn ghost" id="skip" type="button">略過動畫</button></div>
+      </div>
+
+      <div class="panel" id="pChoose" hidden>
+        <h2>第一堆要挑幾枚？</h2>
+        <p class="muted">你看不到正反。直接點硬幣自己挑，或拉桿子、交給電腦分。</p>
+        <p class="count" aria-live="polite">第一堆 <b id="nA">0</b> 枚　第二堆 <b id="nB">100</b> 枚</p>
+        <input type="range" id="slider" min="0" max="100" value="0" aria-label="第一堆的硬幣數量">
+        <div class="btns">
+          <button class="btn ghost" id="p50" type="button">50 / 50</button>
+          <button class="btn ghost" id="p40" type="button">40 / 60</button>
+          <button class="btn ghost" id="pRand" type="button">電腦隨機分</button>
+          <button class="btn ghost" id="pClear" type="button">清空</button>
         </div>
-        <div class="score" aria-live="polite">
-          <div><small>手上的正面</small><strong id="scoreHand">0</strong></div>
-          <div class="sign" id="sign">≠</div>
-          <div><small>桌上的正面</small><strong id="scoreTable">10</strong></div>
+        <div class="btns"><button class="btn" id="split" type="button">分成這兩堆</button></div>
+      </div>
+
+      <div class="panel" id="pAct" hidden>
+        <h2>分好了，接下來呢？</h2>
+        <p class="muted">你還是看不到正反，不過可以把硬幣翻面。點一枚就翻一枚，也可以整堆一起翻。想好就揭曉。</p>
+        <p class="count" id="flipCount" aria-live="polite"></p>
+        <div class="btns">
+          <button class="btn ghost" id="flipA" type="button">翻第一堆全部</button>
+          <button class="btn ghost" id="flipB" type="button">翻第二堆全部</button>
+        </div>
+        <div class="btns">
+          <button class="btn" id="reveal" type="button">揭曉結果</button>
+          <button class="btn ghost" id="resplit" type="button">重新分堆</button>
         </div>
       </div>
-      <div>
-        <div class="zone-label"><span>留在桌上這堆</span><span class="nums" id="tableCount"></span></div>
-        <div class="grid" id="table"></div>
+
+      <div class="panel" id="pResult" hidden>
+        <h2 id="resultTitle" aria-live="polite"></h2>
+        <div class="score">
+          <div><small>第一堆的正面</small><strong id="sA"></strong></div>
+          <div class="sign" id="sign"></div>
+          <div><small>第二堆的正面</small><strong id="sB"></strong></div>
+        </div>
+        <p id="resultText"></p>
+        <p class="test" id="testText" aria-live="polite" hidden></p>
+        <div class="btns">
+          <button class="btn" id="test" type="button">同一個做法連試 100 次</button>
+          <button class="btn ghost" id="again" type="button">重新洗牌再試</button>
+        </div>
       </div>
     </div>
-    <p class="status" id="status" aria-live="polite"></p>
-    <div class="controls">
-      <button class="btn" id="primary" type="button"></button>
-      <button class="btn ghost" id="reset" type="button">重新撒一次</button>
-    </div>
-  </section>
-
-  <section class="stack">
-    <h2>關鍵只有一句話</h2>
-    <p class="lead">手上每多一枚反面，桌上就多留一枚正面。</p>
-    <p>全部的正面只有 10 枚，手上的位置也剛好 10 個。手上有一個位置不是正面，就表示有一枚正面沒被摸到，它還在桌上。所以「手上的反面數」和「桌上的正面數」從一開始就相等。翻面只是把手上的反面變成正面，兩邊的數字就對上了。</p>
-    <div class="field">
-      <label for="kSlider">假設你摸到 <strong class="nums" id="kValue">2</strong> 枚正面，拉拉看：</label>
-      <input type="range" id="kSlider" min="0" max="10" value="2">
-    </div>
-    <div class="lineup">
-      <div class="row">
-        <span class="row-label">手上，翻面前（框起來的是反面）</span>
-        <span class="row-total nums" id="r1"></span>
-        <div class="grid" id="rowBefore"></div>
-      </div>
-      <div class="row">
-        <span class="row-label">手上，翻面後</span>
-        <span class="row-total nums" id="r2"></span>
-        <div class="grid" id="rowAfter"></div>
-      </div>
-      <div class="row">
-        <span class="row-label">桌上的正面（空圈是被你摸走的那幾枚）</span>
-        <span class="row-total nums" id="r3"></span>
-        <div class="grid" id="rowTable"></div>
-      </div>
-      <p class="equation nums" id="equation"></p>
-    </div>
-    <p class="note">桌上其餘的硬幣都是反面，不影響答案，所以這裡沒有畫出來。</p>
-  </section>
-
-  <section class="stack">
-    <h2>每一種運氣都試一遍</h2>
-    <p>摸到幾枚正面只有 11 種可能，全部列在下面。最右欄是真的隨機摸硬幣的結果。你通常只會摸到 0 到 2 枚正面，運氣每次不同，兩堆卻每次都相等。</p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">摸到的正面</th>
-            <th scope="col">手上的反面</th>
-            <th scope="col">桌上的正面</th>
-            <th scope="col">翻面後手上的正面</th>
-            <th scope="col">兩堆相等？</th>
-            <th scope="col">實驗出現次數</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-    <div class="action-row">
-      <button class="btn" id="runBatch" type="button">再做 1,000 次實驗</button>
-      <span class="tally nums" id="tally" aria-live="polite"></span>
-    </div>
-  </section>
-
-  <section class="stack">
-    <h2>一定要摸 10 枚嗎？</h2>
-    <p>要。摸的數量必須等於正面的總數。換個數字試試，每次拉動都會真的隨機抽一次。</p>
-    <div class="field">
-      <label for="mSlider">摸 <strong class="nums" id="mValue">15</strong> 枚，全部翻面：</label>
-      <input type="range" id="mSlider" min="1" max="30" value="15">
-    </div>
-    <div class="readout">
-      <div><small>翻面後手上的正面</small><strong id="mHand"></strong></div>
-      <div><small>桌上的正面</small><strong id="mTable"></strong></div>
-      <div><small>兩堆相差</small><strong id="mDiff"></strong></div>
-    </div>
-    <p id="mText"></p>
-    <div class="action-row">
-      <button class="btn ghost" id="mDraw" type="button">再抽一次</button>
-    </div>
-    <p>寫成算式會更清楚。假設摸 m 枚，其中 k 枚正面。翻面後手上有 m − k 枚正面，桌上有 10 − k 枚正面，兩者相減得到 m − 10。k 被消掉了，所以運氣完全不影響結果。m 取 10，差距就是 0。</p>
-  </section>
-
-  <section class="stack">
-    <h2>這題真正靠的是什麼</h2>
-    <p>這題在網路上流傳時，常搭配「維度轉換」「鏡像對沖」這類說法，聽起來很玄，其實用不到這些概念，國中代數就夠了。這個解法靠的是三件事：</p>
-    <ul class="points">
-      <li><strong>你知道正面總共 10 枚。</strong>這是國王告訴你的。少了這個情報，你就不知道該摸幾枚，這招也就不成立。</li>
-      <li><strong>翻面不必看。</strong>你不知道哪枚是正面，但反面一定會變正面，正面一定會變反面。這個動作在蒙眼時也做得到。</li>
-      <li><strong>你保證的是「相等」，不是數量。</strong>分完後你仍然不知道每堆有幾枚正面，可能各 9 枚，也可能各 0 枚。國王只要求一樣多，所以這樣就夠了。</li>
-    </ul>
-    <p>換成別的數字也一樣：有 n 枚正面，就摸 n 枚，全部翻面。</p>
   </section>
 </main>
 
+<a class="next" id="next" href="answer.html">看答案 →</a>
+
 <script>
 (function () {
-  var TOTAL = 100, HEADS = 10, HAND = 10;
+  var TOTAL = 100, HEADS = 10;
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (id) { return document.getElementById(id); };
+  var board = $('board');
+  var coins = [], order = [], selected = new Set(), stage = 'intro', runId = 0;
 
-  function shuffledCoins(total, heads) {
-    var a = [];
-    for (var i = 0; i < total; i++) a.push(i < heads);
-    for (var j = total - 1; j > 0; j--) {
+  function shuffle(a) {
+    for (var j = a.length - 1; j > 0; j--) {
       var r = Math.floor(Math.random() * (j + 1)), t = a[j];
       a[j] = a[r]; a[r] = t;
     }
     return a;
   }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  // One real trial: take m coins at random, flip them, count heads in both piles.
-  function trial(m) {
-    var coins = shuffledCoins(TOTAL, HEADS), k = 0, handHeads = 0, tableHeads = 0;
-    coins.forEach(function (isHead, i) {
-      if (i < m) { if (isHead) k++; if (!isHead) handHeads++; }
-      else if (isHead) tableHeads++;
-    });
-    return { k: k, handHeads: handHeads, tableHeads: tableHeads };
+  /* ---------- Coins ---------- */
+  for (var i = 0; i < TOTAL; i++) {
+    var el = document.createElement('button');
+    el.type = 'button'; el.className = 'coin'; el.dataset.i = i;
+    var face = document.createElement('span');
+    el.appendChild(face);
+    board.appendChild(el);
+    coins.push({ el: el, face: face, head: i < HEADS, flipped: false });
+    order.push(i);
   }
-
-  /* ---------- Simulator ---------- */
-  var coins = [], hand = [], stage = 'pick', flipping = false, startK = 0;
-
-  function isBlind() { return $('blind').checked && stage !== 'done'; }
-  function faceClass(id) { return isBlind() ? 'b' : (coins[id] ? 'h' : 't'); }
-  function faceChar(id) { return isBlind() ? '' : (coins[id] ? '正' : '反'); }
-  function faceName(id) { return isBlind() ? '看不見的硬幣' : (coins[id] ? '正面硬幣' : '反面硬幣'); }
-
-  function coinButton(id, disabled) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'coin ' + faceClass(id);
-    b.dataset.id = id;
-    b.textContent = faceChar(id);
-    b.setAttribute('aria-label', faceName(id));
-    b.disabled = disabled;
-    return b;
-  }
-
-  function counts() {
-    var h = 0, t = 0;
-    coins.forEach(function (isHead, id) {
-      if (!isHead) return;
-      if (hand.indexOf(id) >= 0) h++; else t++;
-    });
-    return { hand: h, table: t };
-  }
-
-  function renderBoard() {
-    var canPick = stage === 'pick' && !flipping;
-    var tableEl = $('table'), handEl = $('hand');
-    tableEl.textContent = ''; handEl.textContent = '';
-    for (var id = 0; id < TOTAL; id++) {
-      var slot = document.createElement('div');
-      var inHand = hand.indexOf(id) >= 0;
-      slot.className = 'slot' + (inHand ? ' empty' : '');
-      if (!inHand) slot.appendChild(coinButton(id, !canPick || hand.length >= HAND));
-      tableEl.appendChild(slot);
-    }
-    for (var i = 0; i < HAND; i++) {
-      var hs = document.createElement('div');
-      hs.className = 'slot hand-slot' + (hand[i] === undefined ? ' empty' : '');
-      if (hand[i] !== undefined) hs.appendChild(coinButton(hand[i], !canPick));
-      handEl.appendChild(hs);
-    }
-    $('sim').classList.toggle('picking', canPick);
-  }
-
-  function renderInfo() {
-    var c = counts(), blind = isBlind();
-    $('handCount').textContent = hand.length + ' / ' + HAND + ' 枚';
-    $('tableCount').textContent = (TOTAL - hand.length) + ' 枚';
-    $('scoreHand').textContent = blind ? '?' : c.hand;
-    $('scoreTable').textContent = blind ? '?' : c.table;
-    var sign = $('sign');
-    if (blind) { sign.textContent = '?'; sign.className = 'sign'; }
-    else if (c.hand === c.table) { sign.textContent = '='; sign.className = 'sign even'; }
-    else { sign.textContent = '≠'; sign.className = 'sign odd'; }
-
-    var active = stage === 'done' ? 2 : (hand.length === HAND ? 1 : 0);
-    Array.prototype.forEach.call($('steps').children, function (li, i) { li.classList.toggle('on', i === active); });
-
-    var need = HAND - hand.length, msg, primary;
-    if (stage === 'done') {
-      var rest = HAND - startK;
-      msg = '你摸到 ' + startK + ' 枚正面、' + rest + ' 枚反面，桌上留下 ' + rest + ' 枚正面。翻面後，手上那 ' + rest + ' 枚反面都變成正面，兩堆各有 ' + rest + ' 枚正面。';
-      primary = '再撒一次';
-    } else if (need === 0) {
-      msg = blind
-        ? '摸滿 10 枚了。你不知道摸到幾枚正面，這題也不需要知道。接著把手上的硬幣全部翻面。'
-        : '摸滿 10 枚了。手上有 ' + c.hand + ' 枚正面、' + (HAND - c.hand) + ' 枚反面，桌上留著 ' + c.table + ' 枚正面。請注意「手上的反面」和「桌上的正面」數字相同。接著全部翻面。';
-      primary = '把手上 10 枚全部翻面';
+  function isHead(c) { return c.head !== c.flipped; }
+  function paint(c, hidden) {
+    if (hidden) {
+      c.face.className = 'face b';
+      c.face.textContent = c.flipped ? '翻' : '';
+      c.el.setAttribute('aria-label', c.flipped ? '翻過的硬幣，看不到正反' : '硬幣，看不到正反');
     } else {
-      msg = (blind ? '你什麼都看不到。' : '') + '還要摸 ' + need + ' 枚。點桌上的硬幣可以摸起來，點手上的硬幣可以放回去，也可以交給按鈕隨機摸。';
-      primary = need === HAND ? '隨機摸 10 枚' : '隨機摸滿剩下 ' + need + ' 枚';
+      var up = isHead(c);
+      c.face.className = 'face ' + (up ? 'h' : 't');
+      c.face.textContent = up ? '正' : '反';
+      c.el.setAttribute('aria-label', up ? '正面硬幣' : '反面硬幣');
     }
-    $('status').textContent = msg;
-    $('primary').textContent = primary;
-    $('primary').disabled = flipping;
-    $('reset').disabled = flipping;
-    $('reset').hidden = stage === 'done';
+  }
+  // Spins the coin and swaps its face at the halfway point.
+  function spin(c, hidden, delay) {
+    if (reduced) { paint(c, hidden); return; }
+    c.face.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }],
+      { duration: 320, delay: delay || 0, easing: 'ease-in-out' });
+    setTimeout(function () { paint(c, hidden); }, (delay || 0) + 160);
+  }
+  function place(c, x, y, rot) {
+    c.el.style.transform = 'translate(' + (x * 100) + '%,' + (y * 100) + '%)' + (rot ? ' rotate(' + rot + 'deg)' : '');
+  }
+  function layoutGrid() {
+    board.style.aspectRatio = '10 / 10';
+    $('labelA').hidden = $('labelB').hidden = true;
+    order.forEach(function (id, slot) { place(coins[id], slot % 10, Math.floor(slot / 10)); });
+  }
+  function layoutPiles() {
+    var a = order.filter(function (id) { return selected.has(id); });
+    var b = order.filter(function (id) { return !selected.has(id); });
+    var LABEL = 0.7, GAP = 0.3, y = LABEL;
+    var rowsA = Math.ceil(a.length / 10), rowsB = Math.ceil(b.length / 10);
+    var yB = LABEL + rowsA + GAP + LABEL, units = yB + rowsB;
+    board.style.aspectRatio = '10 / ' + units;
+    a.forEach(function (id, n) { place(coins[id], n % 10, y + Math.floor(n / 10)); });
+    b.forEach(function (id, n) { place(coins[id], n % 10, yB + Math.floor(n / 10)); });
+    $('labelA').textContent = '第一堆（' + a.length + ' 枚）';
+    $('labelB').textContent = '第二堆（' + b.length + ' 枚）';
+    $('labelA').style.top = (0.2 / units * 100) + '%';
+    $('labelB').style.top = ((yB - LABEL + 0.2) / units * 100) + '%';
+    $('labelA').hidden = $('labelB').hidden = false;
   }
 
-  function render() { renderBoard(); renderInfo(); }
+  /* ---------- Stages ---------- */
+  function setStage(s) {
+    stage = s;
+    $('pIntro').hidden = s !== 'intro';
+    $('pChoose').hidden = s !== 'choose';
+    $('pAct').hidden = s !== 'act';
+    $('pResult').hidden = s !== 'result';
+    var live = s === 'choose' || s === 'act';
+    board.classList.toggle('live', live);
+    coins.forEach(function (c) { c.el.disabled = !live; });
+  }
+  function caption(title, text) { $('introTitle').textContent = title; $('introText').textContent = text; }
 
-  function flyFrom(rects) {
-    if (reduced) return;
+  function startChoosing() {
+    order.forEach(function (id) { paint(coins[id], true); });
+    layoutGrid();
+    setStage('choose');
+    syncCount();
+  }
+
+  function resetCoins() {
+    selected.clear();
+    coins.forEach(function (c) { c.flipped = false; c.el.classList.remove('sel'); });
+    shuffle(order);
+    $('next').classList.remove('solved');
+    $('testText').hidden = true;
+  }
+
+  function scatter() {
+    coins.forEach(function (c) {
+      place(c, Math.random() * 9, Math.random() * 9, Math.random() * 360 - 180);
+    });
+  }
+
+  async function intro(firstTime) {
+    var id = ++runId;
+    var alive = function () { return id === runId; };
+    setStage('intro');
+    $('labelA').hidden = $('labelB').hidden = true;
+    board.style.aspectRatio = '10 / 10';
+    resetCoins();
+    if (reduced) { startChoosing(); return; }
+
+    if (firstTime) {
+      // Show the real coins in plain order before anything is hidden.
+      coins.forEach(function (c, n) { paint(c, false); place(c, n % 10, Math.floor(n / 10)); });
+      caption('這是國王的 100 枚硬幣', '10 枚正面、90 枚反面。記好了，等一下你就看不到了。');
+      await sleep(2200); if (!alive()) return;
+    }
+    caption('蒙上眼睛', '現在每一枚看起來都一樣，你分不出正反。');
+    coins.forEach(function (c) { spin(c, true, Math.random() * 500); });
+    await sleep(firstTime ? 1500 : 800); if (!alive()) return;
+
+    caption('洗牌', '硬幣全部打亂。');
+    for (var r = 0; r < 3; r++) {
+      scatter();
+      await sleep(460); if (!alive()) return;
+    }
+    layoutGrid();
+    await sleep(520); if (!alive()) return;
+    startChoosing();
+  }
+  $('skip').addEventListener('click', function () { runId++; startChoosing(); });
+
+  /* ---------- Choosing piles ---------- */
+  function syncCount() {
+    var n = selected.size;
+    $('nA').textContent = n;
+    $('nB').textContent = TOTAL - n;
+    $('slider').value = n;
+    $('split').disabled = n === 0 || n === TOTAL;
+    coins.forEach(function (c, id) { c.el.classList.toggle('sel', selected.has(id)); });
+  }
+  // Grows or shrinks the first pile with random coins, keeping any picked by hand.
+  function adjustTo(n) {
+    var inPile = shuffle(Array.from(selected));
+    var outPile = shuffle(order.filter(function (id) { return !selected.has(id); }));
+    while (selected.size > n) selected.delete(inPile.pop());
+    while (selected.size < n) selected.add(outPile.pop());
+    syncCount();
+  }
+  function fresh(n) { selected.clear(); adjustTo(n); }
+  $('slider').addEventListener('input', function (e) { adjustTo(Number(e.target.value)); });
+  $('p50').addEventListener('click', function () { fresh(50); });
+  $('p40').addEventListener('click', function () { fresh(40); });
+  $('pRand').addEventListener('click', function () { fresh(20 + Math.floor(Math.random() * 61)); });
+  $('pClear').addEventListener('click', function () { fresh(0); });
+  $('split').addEventListener('click', function () {
+    coins.forEach(function (c) { c.el.classList.remove('sel'); });
+    layoutPiles();
+    setStage('act');
+    syncFlips();
+  });
+
+  /* ---------- Flipping ---------- */
+  function flipCounts() {
+    var a = 0, b = 0;
+    coins.forEach(function (c, id) { if (c.flipped) { if (selected.has(id)) a++; else b++; } });
+    return { a: a, b: b };
+  }
+  function syncFlips() {
+    var f = flipCounts();
+    $('flipCount').textContent = '已翻：第一堆 ' + f.a + ' / ' + selected.size + ' 枚，第二堆 ' + f.b + ' / ' + (TOTAL - selected.size) + ' 枚';
+  }
+  function flipPile(inFirst) {
     var n = 0;
-    Object.keys(rects).forEach(function (id) {
-      var el = document.querySelector('.sim [data-id="' + id + '"]');
-      if (!el) return;
-      var now = el.getBoundingClientRect(), old = rects[id];
-      el.style.position = 'relative'; el.style.zIndex = 5;
-      var anim = el.animate([
-        { transform: 'translate(' + (old.left - now.left) + 'px,' + (old.top - now.top) + 'px) scale(' + (old.width / now.width) + ')' },
-        { transform: 'none' }
-      ], { duration: 340, delay: n++ * 45, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
-      anim.onfinish = function () { el.style.position = ''; el.style.zIndex = ''; };
+    order.forEach(function (id) {
+      if (selected.has(id) !== inFirst) return;
+      var c = coins[id];
+      c.flipped = !c.flipped;
+      spin(c, true, Math.min(n++ * 12, 400));
     });
+    syncFlips();
   }
+  $('flipA').addEventListener('click', function () { flipPile(true); });
+  $('flipB').addEventListener('click', function () { flipPile(false); });
+  $('resplit').addEventListener('click', function () {
+    coins.forEach(function (c) { c.flipped = false; });
+    startChoosing();
+  });
 
-  function rectsOf(ids) {
-    var out = {};
-    ids.forEach(function (id) {
-      var el = document.querySelector('.sim [data-id="' + id + '"]');
-      if (el) out[id] = el.getBoundingClientRect();
-    });
-    return out;
-  }
-
-  function pickRandom() {
-    var pool = [];
-    for (var id = 0; id < TOTAL; id++) if (hand.indexOf(id) < 0) pool.push(id);
-    var chosen = [];
-    while (hand.length + chosen.length < HAND) {
-      chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  board.addEventListener('click', function (e) {
+    var el = e.target.closest('.coin');
+    if (!el || el.disabled) return;
+    var id = Number(el.dataset.i), c = coins[id];
+    if (stage === 'choose') {
+      if (selected.has(id)) selected.delete(id); else selected.add(id);
+      syncCount();
+    } else if (stage === 'act') {
+      c.flipped = !c.flipped;
+      spin(c, true);
+      syncFlips();
     }
-    var rects = rectsOf(chosen);
-    hand = hand.concat(chosen);
-    render();
-    flyFrom(rects);
-  }
+  });
 
-  function setCoinFace(el, id) {
-    el.className = 'coin ' + faceClass(id);
-    el.textContent = faceChar(id);
-    el.setAttribute('aria-label', faceName(id));
+  /* ---------- Result ---------- */
+  function countHeads() {
+    var a = 0, b = 0;
+    coins.forEach(function (c, id) { if (isHead(c)) { if (selected.has(id)) a++; else b++; } });
+    return { a: a, b: b };
   }
+  $('reveal').addEventListener('click', function () {
+    var n = 0, h = countHeads(), even = h.a === h.b;
+    order.forEach(function (id) { spin(coins[id], false, Math.min(n++ * 8, 600)); });
+    setStage('result');
+    $('sA').textContent = h.a;
+    $('sB').textContent = h.b;
+    $('sign').textContent = even ? '=' : '≠';
+    $('sign').className = 'sign ' + (even ? 'even' : 'odd');
+    $('resultTitle').textContent = even ? '這次一樣多！' : '這次不一樣多';
+    $('resultText').textContent = even
+      ? '不過國王要的是保證。同一個做法多試幾次，看看是不是每次都成立。'
+      : '差了 ' + Math.abs(h.a - h.b) + ' 枚。想想看要怎麼改，或連試 100 次，看這個做法的成功率。';
+    $('testText').hidden = true;
+  });
 
-  function flipHand() {
-    startK = counts().hand;
-    flipping = true;
-    renderInfo();
-    $('sim').classList.remove('picking');
-    var jobs = hand.map(function (id, i) {
-      var el = document.querySelector('#hand [data-id="' + id + '"]');
-      el.disabled = true;
-      if (reduced) { coins[id] = !coins[id]; return Promise.resolve(); }
-      var out = el.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(90deg)' }],
-        { duration: 150, delay: i * 90, easing: 'ease-in', fill: 'forwards' });
-      return out.finished.then(function () {
-        coins[id] = !coins[id];
-        setCoinFace(el, id);
-        var back = el.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }],
-          { duration: 150, easing: 'ease-out', fill: 'forwards' });
-        out.cancel();
-        return back.finished;
+  // Replays the same blind strategy: pile size and how many coins were flipped in each pile.
+  function testStrategy() {
+    var nA = selected.size, f = flipCounts(), wins = 0;
+    for (var t = 0; t < 100; t++) {
+      var deck = [];
+      for (var i = 0; i < TOTAL; i++) deck.push(i < HEADS);
+      shuffle(deck);
+      var a = 0, b = 0;
+      deck.forEach(function (head, i) {
+        var inA = i < nA;
+        var flip = inA ? i < f.a : i < nA + f.b;
+        if (head !== flip) { if (inA) a++; else b++; }
       });
-    });
-    Promise.all(jobs).then(function () {
-      flipping = false;
-      stage = 'done';
-      render();
-      setK(startK);
-    });
+      if (a === b) wins++;
+    }
+    return wins;
   }
-
-  function newRound() {
-    coins = shuffledCoins(TOTAL, HEADS);
-    hand = [];
-    stage = 'pick';
-    render();
-  }
-
-  $('primary').addEventListener('click', function () {
-    if (flipping) return;
-    if (stage === 'done') return newRound();
-    if (hand.length < HAND) return pickRandom();
-    flipHand();
+  $('test').addEventListener('click', function () {
+    var wins = testStrategy(), f = flipCounts(), box = $('testText');
+    var how = '第一堆 ' + selected.size + ' 枚翻 ' + f.a + ' 枚，第二堆 ' + (TOTAL - selected.size) + ' 枚翻 ' + f.b + ' 枚';
+    box.hidden = false;
+    if (wins === 100) {
+      box.textContent = how + '：100 次全部一樣多！你解開了。到右下角看答案，對照為什麼一定成立。';
+      $('next').classList.add('solved');
+    } else {
+      box.textContent = how + '：100 次裡只有 ' + wins + ' 次一樣多。這樣還不算保證，再想想。';
+    }
   });
-  $('reset').addEventListener('click', function () { if (!flipping) newRound(); });
-  $('blind').addEventListener('change', render);
+  $('again').addEventListener('click', function () { intro(false); });
 
-  $('sim').addEventListener('click', function (e) {
-    var el = e.target.closest('button.coin');
-    if (!el || el.disabled || stage !== 'pick' || flipping) return;
-    var id = Number(el.dataset.id), rects = {};
-    rects[id] = el.getBoundingClientRect();
-    var at = hand.indexOf(id);
-    if (at >= 0) hand.splice(at, 1);
-    else if (hand.length < HAND) hand.push(id);
-    else return;
-    render();
-    flyFrom(rects);
-  });
-
-  /* ---------- Slider lineup ---------- */
-  function miniCoin(isHead, mark) {
-    var d = document.createElement('div');
-    d.className = 'slot';
-    var c = document.createElement('span');
-    c.className = 'coin ' + (isHead ? 'h' : 't') + (mark ? ' mark' : '');
-    c.textContent = isHead ? '正' : '反';
-    d.appendChild(c);
-    return d;
-  }
-  function ghostSlot() {
-    var d = document.createElement('div');
-    d.className = 'slot';
-    var c = document.createElement('span');
-    c.className = 'ghost-coin';
-    d.appendChild(c);
-    return d;
-  }
-
-  function setK(k) {
-    $('kSlider').value = k;
-    $('kValue').textContent = k;
-    var rest = HAND - k;
-    var before = $('rowBefore'), after = $('rowAfter'), tbl = $('rowTable');
-    before.textContent = ''; after.textContent = ''; tbl.textContent = '';
-    for (var i = 0; i < HAND; i++) {
-      var wasHead = i < k;
-      before.appendChild(miniCoin(wasHead, !wasHead));
-      after.appendChild(miniCoin(!wasHead, false));
-      tbl.appendChild(wasHead ? ghostSlot() : miniCoin(true, false));
-    }
-    $('r1').textContent = k + ' 正 ' + rest + ' 反';
-    $('r2').textContent = rest + ' 正 ' + k + ' 反';
-    $('r3').textContent = rest + ' 正';
-    $('equation').textContent = '手上 ' + rest + ' 枚正面 = 桌上 ' + rest + ' 枚正面';
-    Array.prototype.forEach.call($('tbody').children, function (tr, i) { tr.classList.toggle('current', i === k); });
-  }
-  $('kSlider').addEventListener('input', function (e) { setK(Number(e.target.value)); });
-
-  /* ---------- Every-case table ---------- */
-  var seen = [], runs = 0, matches = 0;
-  for (var s = 0; s <= HAND; s++) seen.push(0);
-
-  (function buildTable() {
-    var body = $('tbody');
-    for (var k = 0; k <= HAND; k++) {
-      var tr = document.createElement('tr'), rest = HAND - k;
-      tr.innerHTML = '<td>' + k + '</td><td>' + rest + '</td><td>' + rest + '</td><td>' + rest + '</td><td class="ok">相等</td><td data-seen></td>';
-      body.appendChild(tr);
-    }
-  })();
-
-  function runBatch(n) {
-    for (var i = 0; i < n; i++) {
-      var r = trial(HAND);
-      seen[r.k]++; runs++;
-      if (r.handHeads === r.tableHeads) matches++;
-    }
-    Array.prototype.forEach.call($('tbody').children, function (tr, k) {
-      tr.querySelector('[data-seen]').textContent = seen[k].toLocaleString('en-US');
-    });
-    $('tally').textContent = '已做 ' + runs.toLocaleString('en-US') + ' 次，兩堆相等 ' + matches.toLocaleString('en-US') + ' 次。';
-  }
-  $('runBatch').addEventListener('click', function () { runBatch(1000); });
-
-  /* ---------- Hand-size test ---------- */
-  function drawM() {
-    var m = Number($('mSlider').value), r = trial(m), diff = Math.abs(r.handHeads - r.tableHeads);
-    $('mValue').textContent = m;
-    $('mHand').textContent = r.handHeads;
-    $('mTable').textContent = r.tableHeads;
-    $('mDiff').textContent = diff;
-    $('mDiff').className = diff === 0 ? 'good' : 'bad';
-    $('mText').textContent = m === HAND
-      ? '摸 10 枚時，兩堆永遠相等。這次摸到 ' + r.k + ' 枚正面，再抽幾次都一樣。'
-      : '這次摸到 ' + r.k + ' 枚正面，兩堆差 ' + diff + ' 枚。再抽幾次，摸到的正面會變，差距一直是 ' + Math.abs(m - HAND) + ' 枚。';
-  }
-  $('mSlider').addEventListener('input', drawM);
-  $('mDraw').addEventListener('click', drawM);
-
-  newRound();
-  setK(2);
-  runBatch(1000);
-  drawM();
+  intro(true);
 })();
 </script>
 </body>
