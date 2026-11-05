@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>國王的百枚硬幣</title>
+<meta name="description" content="親手摸硬幣、翻面，看懂為什麼蒙著眼也能把 100 枚硬幣分成正面數相等的兩堆。">
+<meta property="og:title" content="國王的百枚硬幣">
+<meta property="og:description" content="親手摸硬幣、翻面，看懂為什麼蒙著眼也能把 100 枚硬幣分成正面數相等的兩堆。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jeffcc.github.io/100coins/">
+<script>
+  // GoatCounter 訪客統計（只在 GitHub Pages 上啟用；本機開啟不統計）
+  // GoatCounter analytics (only on GitHub Pages)
+  const GOATCOUNTER = 'digitalgenius';
+  if (location.hostname.endsWith('github.io')) {
+    const sc = document.createElement('script');
+    sc.async = true;
+    sc.src = 'https://gc.zgo.at/count.js';
+    sc.dataset.goatcounter = `https://${GOATCOUNTER}.goatcounter.com/count`;
+    document.head.appendChild(sc);
+  }
+</script>
+<style>
+  :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one reading column; the coin table is a felt-covered counting board that stays dark in both themes. */
+:root {
+  --bg: #edf1ee;
+  --panel: #fbfcfa;
+  --ink: #14302d;
+  --muted: #526965;
+  --line: #cdd8d3;
+  --accent: #0d6b60;
+  --on-accent: #ffffff;
+  --warn: #a8431c;
+  --felt: #1c4a44;
+  --felt-deep: #153a35;
+  --felt-ink: #e8f3ee;
+  --felt-muted: #a9c6bf;
+  --felt-line: #3d6c65;
+  --felt-warn: #ffb48f;
+  --felt-even: #8ff0d6;
+  --head: #eebd2c;
+  --head-edge: #a97c07;
+  --head-ink: #4a3300;
+  --tail: #b8c5c3;
+  --tail-edge: #7b8b88;
+  --tail-ink: #2b3938;
+  --blind: #5d7a75;
+  --blind-edge: #466460;
+  --display: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", "Noto Sans TC", serif;
+  --body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1918; --panel: #162322; --ink: #e3eeeb; --muted: #94aaa6; --line: #2c3f3d;
+    --accent: #56c7b6; --on-accent: #06211d; --warn: #f0966c;
+    --felt: #173d38; --felt-deep: #102f2b; --felt-line: #38625c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1918; --panel: #162322; --ink: #e3eeeb; --muted: #94aaa6; --line: #2c3f3d;
+  --accent: #56c7b6; --on-accent: #06211d; --warn: #f0966c;
+  --felt: #173d38; --felt-deep: #102f2b; --felt-line: #38625c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.8 var(--body); }
+.page {
+  max-width: 860px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+  display: grid; gap: 52px;
+}
+.page > * { min-width: 0; }
+h1, h2 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.3; }
+h1 { font-size: clamp(34px, 7vw, 52px); }
+h2 { font-size: clamp(24px, 4.4vw, 30px); }
+p { margin: 0; max-width: 40em; }
+.stack { display: grid; gap: 16px; }
+.lead { font-size: 18px; }
+.answer { font-family: var(--display); font-size: clamp(20px, 3.6vw, 24px); line-height: 1.5; color: var(--accent); font-weight: 700; }
+.note { color: var(--muted); font-size: 14px; }
+.nums { font-variant-numeric: tabular-nums; }
+
+button { font: inherit; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--head); outline-offset: 2px; }
+.btn {
+  border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 700; cursor: pointer;
+  background: var(--accent); color: var(--on-accent);
+}
+.btn:hover:not(:disabled) { filter: brightness(1.1); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.ghost { background: transparent; color: inherit; box-shadow: inset 0 0 0 1.5px currentColor; }
+
+/* Counting board */
+.sim { background: var(--felt); color: var(--felt-ink); border-radius: 14px; padding: 18px; display: grid; gap: 16px; }
+.sim-top { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; }
+.steps { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; font-size: 14px; color: var(--felt-muted); }
+.steps li { display: flex; gap: 6px; align-items: center; }
+.steps b { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; box-shadow: inset 0 0 0 1.5px var(--felt-muted); }
+.steps li.on { color: var(--felt-ink); font-weight: 700; }
+.steps li.on b { background: var(--head); color: var(--head-ink); box-shadow: none; }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.switch input { width: 18px; height: 18px; accent-color: var(--head); margin: 0; }
+
+.zones { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.left { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.zone-label { font-size: 14px; color: var(--felt-muted); margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; }
+.grid { display: grid; gap: 4px; grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.slot { aspect-ratio: 1; display: grid; place-items: center; min-width: 0; }
+.slot.empty::after { content: ""; width: 26%; height: 26%; border-radius: 50%; background: var(--felt-deep); }
+.slot.hand-slot { border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--felt-line); background: var(--felt-deep); }
+.slot.hand-slot.empty::after { display: none; }
+
+.coin {
+  width: 100%; height: 100%; border: 0; padding: 0; border-radius: 50%; display: grid; place-items: center;
+  font: 700 clamp(11px, 2.4vw, 15px)/1 var(--display); will-change: transform;
+}
+button.coin { cursor: pointer; }
+button.coin:disabled { cursor: default; }
+.sim.picking button.coin:hover { transform: scale(1.12); }
+.coin.h { background: var(--head); color: var(--head-ink); box-shadow: inset 0 0 0 2px var(--head-edge); }
+.coin.t { background: var(--tail); color: var(--tail-ink); box-shadow: inset 0 0 0 2px var(--tail-edge); }
+.coin.b { background: var(--blind); color: transparent; box-shadow: inset 0 0 0 2px var(--blind-edge); }
+
+.score { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; background: var(--felt-deep); border-radius: 10px; padding: 10px 12px; text-align: center; }
+.score small { display: block; font-size: 13px; color: var(--felt-muted); line-height: 1.4; }
+.score strong { font: 700 34px/1.2 var(--display); font-variant-numeric: tabular-nums; }
+.sign { font: 700 30px/1 var(--display); }
+.sign.even { color: var(--felt-even); }
+.sign.odd { color: var(--felt-warn); }
+
+.status { min-height: 3.6em; margin: 0; max-width: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.sim .btn { background: var(--head); color: var(--head-ink); }
+.sim .btn.ghost { background: transparent; color: var(--felt-ink); }
+
+@media (min-width: 720px) {
+  .zones { grid-template-columns: 230px minmax(0, 1fr); gap: 24px; }
+  .left .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+/* Slider lineup */
+.field { display: grid; gap: 4px; }
+.field label { font-weight: 500; }
+input[type="range"] { width: 100%; max-width: 460px; accent-color: var(--accent); margin: 0; }
+.lineup { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; }
+.row-label { font-size: 14px; color: var(--muted); grid-column: 1; }
+.row-total { grid-column: 2; grid-row: 1; font-size: 14px; font-weight: 700; text-align: right; }
+.row .grid { grid-column: 1 / -1; max-width: 460px; }
+.row .coin { font-size: clamp(11px, 2.6vw, 15px); }
+.ghost-coin { width: 100%; height: 100%; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line); }
+.coin.mark { outline: 3px solid var(--accent); outline-offset: 1px; }
+.equation { font-family: var(--display); font-size: 20px; line-height: 1.6; }
+
+/* Table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 15px; }
+th, td { padding: 7px 10px; text-align: center; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; font-weight: 500; color: var(--muted); line-height: 1.4; vertical-align: bottom; }
+tbody tr:last-child td { border-bottom: 0; }
+tr.current td { background: color-mix(in srgb, var(--accent) 16%, transparent); font-weight: 700; }
+.ok { color: var(--accent); font-weight: 700; }
+.tally { font-weight: 500; }
+.action-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+
+/* Hand-size test */
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
+.readout small { display: block; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.readout strong { font: 700 28px/1.3 var(--display); font-variant-numeric: tabular-nums; }
+.readout .bad { color: var(--warn); }
+.readout .good { color: var(--accent); }
+
+.points { margin: 0; padding-left: 1.3em; display: grid; gap: 10px; max-width: 40em; }
+</style>
+
+</head>
+<body>
+<main class="page">
+  <header class="stack">
+    <h1>國王的百枚硬幣</h1>
+    <p class="lead">桌上有 100 枚硬幣，10 枚正面、90 枚反面。你被蒙上眼睛，也摸不出正反。國王要你分成兩堆，而且兩堆的正面數量必須一樣。</p>
+    <p class="answer">解法：隨便摸 10 枚當一堆，再把這 10 枚全部翻面。</p>
+    <p>聽起來像魔術，動手做一次就知道了。正面寫「正」，反面寫「反」。想體驗國王的難題，可以勾選「蒙上眼睛」。</p>
+  </header>
+
+  <section class="sim picking" id="sim" aria-label="硬幣模擬">
+    <div class="sim-top">
+      <ol class="steps" id="steps">
+        <li data-step="0"><b>1</b>摸 10 枚</li>
+        <li data-step="1"><b>2</b>全部翻面</li>
+        <li data-step="2"><b>3</b>數正面</li>
+      </ol>
+      <label class="switch"><input type="checkbox" id="blind">蒙上眼睛</label>
+    </div>
+    <div class="zones">
+      <div class="left">
+        <div>
+          <div class="zone-label"><span>你手上這堆</span><span class="nums" id="handCount"></span></div>
+          <div class="grid" id="hand"></div>
+        </div>
+        <div class="score" aria-live="polite">
+          <div><small>手上的正面</small><strong id="scoreHand">0</strong></div>
+          <div class="sign" id="sign">≠</div>
+          <div><small>桌上的正面</small><strong id="scoreTable">10</strong></div>
+        </div>
+      </div>
+      <div>
+        <div class="zone-label"><span>留在桌上這堆</span><span class="nums" id="tableCount"></span></div>
+        <div class="grid" id="table"></div>
+      </div>
+    </div>
+    <p class="status" id="status" aria-live="polite"></p>
+    <div class="controls">
+      <button class="btn" id="primary" type="button"></button>
+      <button class="btn ghost" id="reset" type="button">重新撒一次</button>
+    </div>
+  </section>
+
+  <section class="stack">
+    <h2>關鍵只有一句話</h2>
+    <p class="lead">手上每多一枚反面，桌上就多留一枚正面。</p>
+    <p>全部的正面只有 10 枚，手上的位置也剛好 10 個。手上有一個位置不是正面，就表示有一枚正面沒被摸到，它還在桌上。所以「手上的反面數」和「桌上的正面數」從一開始就相等。翻面只是把手上的反面變成正面，兩邊的數字就對上了。</p>
+    <div class="field">
+      <label for="kSlider">假設你摸到 <strong class="nums" id="kValue">2</strong> 枚正面，拉拉看：</label>
+      <input type="range" id="kSlider" min="0" max="10" value="2">
+    </div>
+    <div class="lineup">
+      <div class="row">
+        <span class="row-label">手上，翻面前（框起來的是反面）</span>
+        <span class="row-total nums" id="r1"></span>
+        <div class="grid" id="rowBefore"></div>
+      </div>
+      <div class="row">
+        <span class="row-label">手上，翻面後</span>
+        <span class="row-total nums" id="r2"></span>
+        <div class="grid" id="rowAfter"></div>
+      </div>
+      <div class="row">
+        <span class="row-label">桌上的正面（空圈是被你摸走的那幾枚）</span>
+        <span class="row-total nums" id="r3"></span>
+        <div class="grid" id="rowTable"></div>
+      </div>
+      <p class="equation nums" id="equation"></p>
+    </div>
+    <p class="note">桌上其餘的硬幣都是反面，不影響答案，所以這裡沒有畫出來。</p>
+  </section>
+
+  <section class="stack">
+    <h2>每一種運氣都試一遍</h2>
+    <p>摸到幾枚正面只有 11 種可能，全部列在下面。最右欄是真的隨機摸硬幣的結果。你通常只會摸到 0 到 2 枚正面，運氣每次不同，兩堆卻每次都相等。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">摸到的正面</th>
+            <th scope="col">手上的反面</th>
+            <th scope="col">桌上的正面</th>
+            <th scope="col">翻面後手上的正面</th>
+            <th scope="col">兩堆相等？</th>
+            <th scope="col">實驗出現次數</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="action-row">
+      <button class="btn" id="runBatch" type="button">再做 1,000 次實驗</button>
+      <span class="tally nums" id="tally" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="stack">
+    <h2>一定要摸 10 枚嗎？</h2>
+    <p>要。摸的數量必須等於正面的總數。換個數字試試，每次拉動都會真的隨機抽一次。</p>
+    <div class="field">
+      <label for="mSlider">摸 <strong class="nums" id="mValue">15</strong> 枚，全部翻面：</label>
+      <input type="range" id="mSlider" min="1" max="30" value="15">
+    </div>
+    <div class="readout">
+      <div><small>翻面後手上的正面</small><strong id="mHand"></strong></div>
+      <div><small>桌上的正面</small><strong id="mTable"></strong></div>
+      <div><small>兩堆相差</small><strong id="mDiff"></strong></div>
+    </div>
+    <p id="mText"></p>
+    <div class="action-row">
+      <button class="btn ghost" id="mDraw" type="button">再抽一次</button>
+    </div>
+    <p>寫成算式會更清楚。假設摸 m 枚，其中 k 枚正面。翻面後手上有 m − k 枚正面，桌上有 10 − k 枚正面，兩者相減得到 m − 10。k 被消掉了，所以運氣完全不影響結果。m 取 10，差距就是 0。</p>
+  </section>
+
+  <section class="stack">
+    <h2>這題真正靠的是什麼</h2>
+    <p>這題在網路上流傳時，常搭配「維度轉換」「鏡像對沖」這類說法，聽起來很玄，其實用不到這些概念，國中代數就夠了。這個解法靠的是三件事：</p>
+    <ul class="points">
+      <li><strong>你知道正面總共 10 枚。</strong>這是國王告訴你的。少了這個情報，你就不知道該摸幾枚，這招也就不成立。</li>
+      <li><strong>翻面不必看。</strong>你不知道哪枚是正面，但反面一定會變正面，正面一定會變反面。這個動作在蒙眼時也做得到。</li>
+      <li><strong>你保證的是「相等」，不是數量。</strong>分完後你仍然不知道每堆有幾枚正面，可能各 9 枚，也可能各 0 枚。國王只要求一樣多，所以這樣就夠了。</li>
+    </ul>
+    <p>換成別的數字也一樣：有 n 枚正面，就摸 n 枚，全部翻面。</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var TOTAL = 100, HEADS = 10, HAND = 10;
+  var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function shuffledCoins(total, heads) {
+    var a = [];
+    for (var i = 0; i < total; i++) a.push(i < heads);
+    for (var j = total - 1; j > 0; j--) {
+      var r = Math.floor(Math.random() * (j + 1)), t = a[j];
+      a[j] = a[r]; a[r] = t;
+    }
+    return a;
+  }
+
+  // One real trial: take m coins at random, flip them, count heads in both piles.
+  function trial(m) {
+    var coins = shuffledCoins(TOTAL, HEADS), k = 0, handHeads = 0, tableHeads = 0;
+    coins.forEach(function (isHead, i) {
+      if (i < m) { if (isHead) k++; if (!isHead) handHeads++; }
+      else if (isHead) tableHeads++;
+    });
+    return { k: k, handHeads: handHeads, tableHeads: tableHeads };
+  }
+
+  /* ---------- Simulator ---------- */
+  var coins = [], hand = [], stage = 'pick', flipping = false, startK = 0;
+
+  function isBlind() { return $('blind').checked && stage !== 'done'; }
+  function faceClass(id) { return isBlind() ? 'b' : (coins[id] ? 'h' : 't'); }
+  function faceChar(id) { return isBlind() ? '' : (coins[id] ? '正' : '反'); }
+  function faceName(id) { return isBlind() ? '看不見的硬幣' : (coins[id] ? '正面硬幣' : '反面硬幣'); }
+
+  function coinButton(id, disabled) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'coin ' + faceClass(id);
+    b.dataset.id = id;
+    b.textContent = faceChar(id);
+    b.setAttribute('aria-label', faceName(id));
+    b.disabled = disabled;
+    return b;
+  }
+
+  function counts() {
+    var h = 0, t = 0;
+    coins.forEach(function (isHead, id) {
+      if (!isHead) return;
+      if (hand.indexOf(id) >= 0) h++; else t++;
+    });
+    return { hand: h, table: t };
+  }
+
+  function renderBoard() {
+    var canPick = stage === 'pick' && !flipping;
+    var tableEl = $('table'), handEl = $('hand');
+    tableEl.textContent = ''; handEl.textContent = '';
+    for (var id = 0; id < TOTAL; id++) {
+      var slot = document.createElement('div');
+      var inHand = hand.indexOf(id) >= 0;
+      slot.className = 'slot' + (inHand ? ' empty' : '');
+      if (!inHand) slot.appendChild(coinButton(id, !canPick || hand.length >= HAND));
+      tableEl.appendChild(slot);
+    }
+    for (var i = 0; i < HAND; i++) {
+      var hs = document.createElement('div');
+      hs.className = 'slot hand-slot' + (hand[i] === undefined ? ' empty' : '');
+      if (hand[i] !== undefined) hs.appendChild(coinButton(hand[i], !canPick));
+      handEl.appendChild(hs);
+    }
+    $('sim').classList.toggle('picking', canPick);
+  }
+
+  function renderInfo() {
+    var c = counts(), blind = isBlind();
+    $('handCount').textContent = hand.length + ' / ' + HAND + ' 枚';
+    $('tableCount').textContent = (TOTAL - hand.length) + ' 枚';
+    $('scoreHand').textContent = blind ? '?' : c.hand;
+    $('scoreTable').textContent = blind ? '?' : c.table;
+    var sign = $('sign');
+    if (blind) { sign.textContent = '?'; sign.className = 'sign'; }
+    else if (c.hand === c.table) { sign.textContent = '='; sign.className = 'sign even'; }
+    else { sign.textContent = '≠'; sign.className = 'sign odd'; }
+
+    var active = stage === 'done' ? 2 : (hand.length === HAND ? 1 : 0);
+    Array.prototype.forEach.call($('steps').children, function (li, i) { li.classList.toggle('on', i === active); });
+
+    var need = HAND - hand.length, msg, primary;
+    if (stage === 'done') {
+      var rest = HAND - startK;
+      msg = '你摸到 ' + startK + ' 枚正面、' + rest + ' 枚反面，桌上留下 ' + rest + ' 枚正面。翻面後，手上那 ' + rest + ' 枚反面都變成正面，兩堆各有 ' + rest + ' 枚正面。';
+      primary = '再撒一次';
+    } else if (need === 0) {
+      msg = blind
+        ? '摸滿 10 枚了。你不知道摸到幾枚正面，這題也不需要知道。接著把手上的硬幣全部翻面。'
+        : '摸滿 10 枚了。手上有 ' + c.hand + ' 枚正面、' + (HAND - c.hand) + ' 枚反面，桌上留著 ' + c.table + ' 枚正面。請注意「手上的反面」和「桌上的正面」數字相同。接著全部翻面。';
+      primary = '把手上 10 枚全部翻面';
+    } else {
+      msg = (blind ? '你什麼都看不到。' : '') + '還要摸 ' + need + ' 枚。點桌上的硬幣可以摸起來，點手上的硬幣可以放回去，也可以交給按鈕隨機摸。';
+      primary = need === HAND ? '隨機摸 10 枚' : '隨機摸滿剩下 ' + need + ' 枚';
+    }
+    $('status').textContent = msg;
+    $('primary').textContent = primary;
+    $('primary').disabled = flipping;
+    $('reset').disabled = flipping;
+    $('reset').hidden = stage === 'done';
+  }
+
+  function render() { renderBoard(); renderInfo(); }
+
+  function flyFrom(rects) {
+    if (reduced) return;
+    var n = 0;
+    Object.keys(rects).forEach(function (id) {
+      var el = document.querySelector('.sim [data-id="' + id + '"]');
+      if (!el) return;
+      var now = el.getBoundingClientRect(), old = rects[id];
+      el.style.position = 'relative'; el.style.zIndex = 5;
+      var anim = el.animate([
+        { transform: 'translate(' + (old.left - now.left) + 'px,' + (old.top - now.top) + 'px) scale(' + (old.width / now.width) + ')' },
+        { transform: 'none' }
+      ], { duration: 340, delay: n++ * 45, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+      anim.onfinish = function () { el.style.position = ''; el.style.zIndex = ''; };
+    });
+  }
+
+  function rectsOf(ids) {
+    var out = {};
+    ids.forEach(function (id) {
+      var el = document.querySelector('.sim [data-id="' + id + '"]');
+      if (el) out[id] = el.getBoundingClientRect();
+    });
+    return out;
+  }
+
+  function pickRandom() {
+    var pool = [];
+    for (var id = 0; id < TOTAL; id++) if (hand.indexOf(id) < 0) pool.push(id);
+    var chosen = [];
+    while (hand.length + chosen.length < HAND) {
+      chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+    }
+    var rects = rectsOf(chosen);
+    hand = hand.concat(chosen);
+    render();
+    flyFrom(rects);
+  }
+
+  function setCoinFace(el, id) {
+    el.className = 'coin ' + faceClass(id);
+    el.textContent = faceChar(id);
+    el.setAttribute('aria-label', faceName(id));
+  }
+
+  function flipHand() {
+    startK = counts().hand;
+    flipping = true;
+    renderInfo();
+    $('sim').classList.remove('picking');
+    var jobs = hand.map(function (id, i) {
+      var el = document.querySelector('#hand [data-id="' + id + '"]');
+      el.disabled = true;
+      if (reduced) { coins[id] = !coins[id]; return Promise.resolve(); }
+      var out = el.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(90deg)' }],
+        { duration: 150, delay: i * 90, easing: 'ease-in', fill: 'forwards' });
+      return out.finished.then(function () {
+        coins[id] = !coins[id];
+        setCoinFace(el, id);
+        var back = el.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }],
+          { duration: 150, easing: 'ease-out', fill: 'forwards' });
+        out.cancel();
+        return back.finished;
+      });
+    });
+    Promise.all(jobs).then(function () {
+      flipping = false;
+      stage = 'done';
+      render();
+      setK(startK);
+    });
+  }
+
+  function newRound() {
+    coins = shuffledCoins(TOTAL, HEADS);
+    hand = [];
+    stage = 'pick';
+    render();
+  }
+
+  $('primary').addEventListener('click', function () {
+    if (flipping) return;
+    if (stage === 'done') return newRound();
+    if (hand.length < HAND) return pickRandom();
+    flipHand();
+  });
+  $('reset').addEventListener('click', function () { if (!flipping) newRound(); });
+  $('blind').addEventListener('change', render);
+
+  $('sim').addEventListener('click', function (e) {
+    var el = e.target.closest('button.coin');
+    if (!el || el.disabled || stage !== 'pick' || flipping) return;
+    var id = Number(el.dataset.id), rects = {};
+    rects[id] = el.getBoundingClientRect();
+    var at = hand.indexOf(id);
+    if (at >= 0) hand.splice(at, 1);
+    else if (hand.length < HAND) hand.push(id);
+    else return;
+    render();
+    flyFrom(rects);
+  });
+
+  /* ---------- Slider lineup ---------- */
+  function miniCoin(isHead, mark) {
+    var d = document.createElement('div');
+    d.className = 'slot';
+    var c = document.createElement('span');
+    c.className = 'coin ' + (isHead ? 'h' : 't') + (mark ? ' mark' : '');
+    c.textContent = isHead ? '正' : '反';
+    d.appendChild(c);
+    return d;
+  }
+  function ghostSlot() {
+    var d = document.createElement('div');
+    d.className = 'slot';
+    var c = document.createElement('span');
+    c.className = 'ghost-coin';
+    d.appendChild(c);
+    return d;
+  }
+
+  function setK(k) {
+    $('kSlider').value = k;
+    $('kValue').textContent = k;
+    var rest = HAND - k;
+    var before = $('rowBefore'), after = $('rowAfter'), tbl = $('rowTable');
+    before.textContent = ''; after.textContent = ''; tbl.textContent = '';
+    for (var i = 0; i < HAND; i++) {
+      var wasHead = i < k;
+      before.appendChild(miniCoin(wasHead, !wasHead));
+      after.appendChild(miniCoin(!wasHead, false));
+      tbl.appendChild(wasHead ? ghostSlot() : miniCoin(true, false));
+    }
+    $('r1').textContent = k + ' 正 ' + rest + ' 反';
+    $('r2').textContent = rest + ' 正 ' + k + ' 反';
+    $('r3').textContent = rest + ' 正';
+    $('equation').textContent = '手上 ' + rest + ' 枚正面 = 桌上 ' + rest + ' 枚正面';
+    Array.prototype.forEach.call($('tbody').children, function (tr, i) { tr.classList.toggle('current', i === k); });
+  }
+  $('kSlider').addEventListener('input', function (e) { setK(Number(e.target.value)); });
+
+  /* ---------- Every-case table ---------- */
+  var seen = [], runs = 0, matches = 0;
+  for (var s = 0; s <= HAND; s++) seen.push(0);
+
+  (function buildTable() {
+    var body = $('tbody');
+    for (var k = 0; k <= HAND; k++) {
+      var tr = document.createElement('tr'), rest = HAND - k;
+      tr.innerHTML = '<td>' + k + '</td><td>' + rest + '</td><td>' + rest + '</td><td>' + rest + '</td><td class="ok">相等</td><td data-seen></td>';
+      body.appendChild(tr);
+    }
+  })();
+
+  function runBatch(n) {
+    for (var i = 0; i < n; i++) {
+      var r = trial(HAND);
+      seen[r.k]++; runs++;
+      if (r.handHeads === r.tableHeads) matches++;
+    }
+    Array.prototype.forEach.call($('tbody').children, function (tr, k) {
+      tr.querySelector('[data-seen]').textContent = seen[k].toLocaleString('en-US');
+    });
+    $('tally').textContent = '已做 ' + runs.toLocaleString('en-US') + ' 次，兩堆相等 ' + matches.toLocaleString('en-US') + ' 次。';
+  }
+  $('runBatch').addEventListener('click', function () { runBatch(1000); });
+
+  /* ---------- Hand-size test ---------- */
+  function drawM() {
+    var m = Number($('mSlider').value), r = trial(m), diff = Math.abs(r.handHeads - r.tableHeads);
+    $('mValue').textContent = m;
+    $('mHand').textContent = r.handHeads;
+    $('mTable').textContent = r.tableHeads;
+    $('mDiff').textContent = diff;
+    $('mDiff').className = diff === 0 ? 'good' : 'bad';
+    $('mText').textContent = m === HAND
+      ? '摸 10 枚時，兩堆永遠相等。這次摸到 ' + r.k + ' 枚正面，再抽幾次都一樣。'
+      : '這次摸到 ' + r.k + ' 枚正面，兩堆差 ' + diff + ' 枚。再抽幾次，摸到的正面會變，差距一直是 ' + Math.abs(m - HAND) + ' 枚。';
+  }
+  $('mSlider').addEventListener('input', drawM);
+  $('mDraw').addEventListener('click', drawM);
+
+  newRound();
+  setK(2);
+  runBatch(1000);
+  drawM();
+})();
+</script>
+</body>
+</html>
